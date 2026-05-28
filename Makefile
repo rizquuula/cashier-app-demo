@@ -14,10 +14,21 @@ SANDBOX_ENV := \
 
 help:
 	@echo "Available targets:"
-	@echo "  opencode        - Run opencode in an isolated \$$HOME sandbox"
-	@echo "  opencode-debug  - Show resolved config + skills inside the sandbox"
-	@echo "  sandbox-clean   - Delete the .sandbox directory"
-	@echo "  help            - Show this help message (default)"
+	@echo ""
+	@echo "  Sandbox:"
+	@echo "    opencode        - Run opencode in an isolated \$$HOME sandbox"
+	@echo "    opencode-debug  - Show resolved config + skills inside the sandbox"
+	@echo "    sandbox-clean   - Delete the .sandbox directory"
+	@echo ""
+	@echo "  App:"
+	@echo "    run             - Start the Flask app"
+	@echo "    test            - Run tests with pytest"
+	@echo "    seed            - Seed the database"
+	@echo "    init-db         - Initialize database tables"
+	@echo "    db-clean        - Remove the instance directory"
+	@echo ""
+	@echo "  Other:"
+	@echo "    help            - Show this help message (default)"
 
 $(SANDBOX):
 	mkdir -p $(SANDBOX)/.config/opencode \
