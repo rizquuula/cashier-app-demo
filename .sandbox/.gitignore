@@ -2,3 +2,4 @@
 .claude/
 .local/
 .npm/
+.rustup/
