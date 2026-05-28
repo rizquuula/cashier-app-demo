@@ -60,6 +60,9 @@ run: $(VENV)
 init-db: $(VENV)
 	$(PYTHON) -c "from app import create_app; from models import db; app = create_app(); app.app_context().push(); db.create_all(); print('DB initialized')"
 
+test: $(VENV)
+	$(PYTHON) -m pytest tests/ -v
+
 seed: $(VENV)
 	$(PYTHON) seed.py
 
