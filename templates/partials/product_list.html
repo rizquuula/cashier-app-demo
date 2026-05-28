@@ -1,0 +1,30 @@
+<div class="overflow-x-auto">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="text-left text-gray-500 border-b">
+                <th class="pb-2">Name</th>
+                <th class="pb-2">Price</th>
+                <th class="pb-2">Stock</th>
+                <th class="pb-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="py-2">{{ product.name }}</td>
+                <td class="py-2">${{ "%.2f"|format(product.price) }}</td>
+                <td class="py-2">{{ product.stock }}</td>
+                <td class="py-2 flex gap-2">
+                    <button hx-get="/products/{{ product.id }}/edit" hx-target="closest tr" hx-swap="outerHTML"
+                            class="px-3 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600">Edit</button>
+                    <button hx-delete="/products/{{ product.id }}" hx-target="body"
+                            class="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                            hx-confirm="Delete {{ product.name }}?">Delete</button>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="py-4 text-center text-gray-400">No products yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

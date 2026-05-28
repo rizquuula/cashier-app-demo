@@ -1,0 +1,91 @@
+<div>
+    <div class="mb-4">
+        <div class="flex gap-2 mb-3">
+            <select id="product-select" class="px-3 py-2 border rounded-lg text-sm flex-1">
+                <option value="">-- Select Product --</option>
+                {% for product in products %}
+                <option value="{{ product.id }}" data-price="{{ product.price }}" data-name="{{ product.name }}">
+                    {{ product.name }} - ${{ "%.2f"|format(product.price) }} ({{ product.stock }})
+                </option>
+                {% endfor %}
+            </select>
+            <input type="number" id="cart-qty" value="1" min="1" class="px-3 py-2 border rounded-lg text-sm w-20">
+            <button onclick="addToCart()"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">Add</button>
+        </div>
+        <table class="w-full text-sm mb-3" id="cart-table">
+            <thead>
+                <tr class="text-left text-gray-500 border-b">
+                    <th class="pb-2">Item</th>
+                    <th class="pb-2">Qty</th>
+                    <th class="pb-2">Price</th>
+                    <th class="pb-2">Subtotal</th>
+                    <th class="pb-2"></th>
+                </tr>
+            </thead>
+            <tbody id="cart-body"></tbody>
+        </table>
+        <div class="flex justify-between items-center border-t pt-3">
+            <span class="text-lg font-bold" id="cart-total">Total: $0.00</span>
+            <form hx-post="/transactions/checkout" hx-target="body" onsubmit="return prepareCheckout(event)">
+                <input type="hidden" name="items_json" id="items-json">
+                <button type="submit" id="checkout-btn" disabled
+                        class="px-6 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:opacity-50">Checkout</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cartItems = [];
+    function addToCart() {
+        const select = document.getElementById('product-select');
+        const qtyInput = document.getElementById('cart-qty');
+        const option = select.options[select.selectedIndex];
+        if (!option.value) return;
+        const productId = parseInt(option.value);
+        const name = option.dataset.name;
+        const price = parseFloat(option.dataset.price);
+        const qty = parseInt(qtyInput.value) || 1;
+        const existing = cartItems.find(i => i.product_id === productId);
+        if (existing) {
+            existing.quantity += qty;
+        } else {
+            cartItems.push({ product_id: productId, name, price, quantity: qty });
+        }
+        renderCart();
+        qtyInput.value = 1;
+        select.value = '';
+    }
+    function removeFromCart(index) {
+        cartItems.splice(index, 1);
+        renderCart();
+    }
+    function renderCart() {
+        const tbody = document.getElementById('cart-body');
+        const totalEl = document.getElementById('cart-total');
+        const btn = document.getElementById('checkout-btn');
+        tbody.innerHTML = '';
+        let total = 0;
+        cartItems.forEach((item, i) => {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
+            const tr = document.createElement('tr');
+            tr.className = 'border-b';
+            tr.innerHTML = '<td class="py-1">' + item.name + '</td>' +
+                '<td class="py-1">' + item.quantity + '</td>' +
+                '<td class="py-1">$' + item.price.toFixed(2) + '</td>' +
+                '<td class="py-1">$' + subtotal.toFixed(2) + '</td>' +
+                '<td class="py-1"><button onclick="removeFromCart(' + i + ')" class="text-red-500 text-xs">Remove</button></td>';
+            tbody.appendChild(tr);
+        });
+        totalEl.textContent = 'Total: $' + total.toFixed(2);
+        btn.disabled = cartItems.length === 0;
+    }
+    function prepareCheckout(event) {
+        if (cartItems.length === 0) { event.preventDefault(); return false; }
+        const payload = cartItems.map(i => ({ product_id: i.product_id, quantity: i.quantity }));
+        document.getElementById('items-json').value = JSON.stringify(payload);
+        return true;
+    }
+</script>

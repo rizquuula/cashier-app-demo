@@ -46,5 +46,25 @@ opencode-debug: $(SANDBOX)
 sandbox-clean:
 	rm -rf $(SANDBOX)
 
+VENV := $(CURDIR)/venv
+PYTHON := $(VENV)/bin/python
+PIP := $(VENV)/bin/pip
+
+$(VENV):
+	python3 -m venv $(VENV)
+	$(PIP) install -r requirements.txt
+
+run: $(VENV)
+	$(PYTHON) app.py
+
+init-db: $(VENV)
+	$(PYTHON) -c "from app import create_app; from models import db; app = create_app(); app.app_context().push(); db.create_all(); print('DB initialized')"
+
+seed: $(VENV)
+	$(PYTHON) seed.py
+
+db-clean:
+	rm -rf $(CURDIR)/instance
+
 .DEFAULT_GOAL := help
-.PHONY: help opencode opencode-debug sandbox-clean
+.PHONY: help opencode opencode-debug sandbox-clean run init-db seed db-clean

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </div>
+    <script>
+        let chartInstance = null;
+        function initChart() {
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
+            if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+            const raw = canvas.dataset.chart || '{"labels":[],"data":[]}';
+            let chartData;
+            try { chartData = JSON.parse(raw); } catch(e) { chartData = {labels:[], data:[]}; }
+            const ctx = canvas.getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Sales',
+                        data: chartData.data,
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initChart);
+        document.addEventListener('htmx:afterSwap', initChart);
+    </script>
+</body>
+</html>

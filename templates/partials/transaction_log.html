@@ -1,0 +1,38 @@
+<div class="overflow-x-auto max-h-96 overflow-y-auto">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="text-left text-gray-500 border-b sticky top-0 bg-white">
+                <th class="pb-2">#</th>
+                <th class="pb-2">Items</th>
+                <th class="pb-2">Total</th>
+                <th class="pb-2">Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tx in transactions %}
+            <tr class="border-b hover:bg-gray-50 cursor-pointer"
+                onclick="this.nextElementSibling.classList.toggle('hidden')">
+                <td class="py-2 font-mono text-xs">{{ tx.id }}</td>
+                <td class="py-2">{{ tx.items|length }} item(s)</td>
+                <td class="py-2 font-medium">${{ "%.2f"|format(tx.total_amount) }}</td>
+                <td class="py-2 text-xs text-gray-500">{{ tx.created_at.strftime('%H:%M') }}</td>
+            </tr>
+            <tr class="hidden">
+                <td colspan="4" class="px-4 pb-2">
+                    <table class="w-full text-xs text-gray-600">
+                        {% for item in tx.items %}
+                        <tr>
+                            <td class="py-1">{{ item.product.name }}</td>
+                            <td class="py-1">x{{ item.quantity }}</td>
+                            <td class="py-1 text-right">${{ "%.2f"|format(item.subtotal) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="py-4 text-center text-gray-400">No transactions yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
