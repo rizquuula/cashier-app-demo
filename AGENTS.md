@@ -1,0 +1,1 @@
+Our opencode config dir is in `./.opencode`.
